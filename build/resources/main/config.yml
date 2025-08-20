@@ -1,0 +1,30 @@
+# Paramètres
+total-days: 100
+
+# Interface
+gui:
+  title: "&6Récompenses Journalières &7(Page {page}/{max})"
+  navigation:
+    previous: "&aPage précédente"
+    next: "&aPage suivante"
+
+# Messages
+messages:
+  claim-success: "&aVous avez réclamé la récompense du jour {day} !"
+  invalid-order: "&cVous devez réclamer les jours dans l'ordre !"
+  wait-message: "&eRevenez dans {time} heures !"
+
+# Récompenses
+rewards:
+  day-1:
+    - "eco give {player} 1000"
+  day-7:
+    - "eco give {player} 5000"
+    - "give {player} diamond 1"
+  day-30:
+    - "eco give {player} 10000"
+    - "give {player} diamond_block 1"
+
+  reset:
+    enabled: true
+    delay: 1

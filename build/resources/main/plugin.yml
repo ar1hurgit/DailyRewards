@@ -1,0 +1,13 @@
+name: DailyRewards
+version: 1.0
+main: Reward.rewards
+api-version: "1.21"
+authors: [YourName]
+commands:
+  rewards:
+    description: Open daily rewards menu
+    usage: /rewards [admin]
+permissions:
+  dailyrewards.admin:
+    description: Access to admin commands
+    default: op
