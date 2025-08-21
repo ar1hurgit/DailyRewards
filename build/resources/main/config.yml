@@ -3,7 +3,7 @@ total-days: 100
 
 # Interface
 gui:
-  title: "&6Récompenses Journalières &7(Page {page}/{max})"
+  title: "&6DailyRewardss &7(Page {page}/{max})"
   navigation:
     previous: "&aPage précédente"
     next: "&aPage suivante"
