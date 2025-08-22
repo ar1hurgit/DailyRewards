@@ -14,25 +14,54 @@ import java.util.List;
 
 public class RewardsTabCompleter implements TabCompleter {
 
-    public RewardsTabCompleter() {
-    }
-
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command  cmd, @NotNull String alias, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String alias, String[] args) {
         List<String> completions = new ArrayList<>();
+
+        // ==== VÉRIFICATION GLOBALE : LE JOUEUR A-T-IL UNE PERMISSION ADMIN ? ====
+        boolean hasAdminPermission = sender.hasPermission("dailyrewards.admin.*")
+                || sender.hasPermission("dailyrewards.admin.set")
+                || sender.hasPermission("dailyrewards.admin.day");
+        // ==== SI PAS DE PERMISSION, ON RENVOIE RIEN ====
+        if (!hasAdminPermission) {
+            return completions;
+        }
+
+        // ==== SUGGESTION POUR LE PREMIER ARGUMENT ====
         if (args.length == 1) {
             completions.add("admin");
             return filter(args[0], completions);
         }
+
+        // ==== SUGGESTIONS POUR /rewards admin ====
         if (args[0].equalsIgnoreCase("admin")) {
-            if (args.length == 2) return filter(args[1], Arrays.asList("reload", "set", "day"));
-            if (args.length == 3 && args[1].equalsIgnoreCase("set"))
+            if (args.length == 2) {
+                List<String> subCommands = new ArrayList<>();
+                if (sender.hasPermission("dailyrewards.admin.*") || sender.hasPermission("dailyrewards.admin.set")) {
+                    subCommands.add("set");
+                }
+                if (sender.hasPermission("dailyrewards.admin.*") || sender.hasPermission("dailyrewards.admin.day")) {
+                    subCommands.add("day");
+                }
+                return filter(args[1], subCommands);
+            }
+
+            // ==== SUGGESTIONS POUR /rewards admin set [?] ====
+            if (args.length == 3 && args[1].equalsIgnoreCase("set")) {
                 return filter(args[2], Bukkit.getOnlinePlayers().stream().map(Player::getName).toList());
-            if (args.length == 3 && args[1].equalsIgnoreCase("day"))
-                return filter(args[2], Arrays.asList("1", "7", "14", "30"));
-            if (args.length == 4 && args[1].equalsIgnoreCase("set"))
-                return filter(args[3], Arrays.asList("1", "7", "14", "30"));
+            }
+
+            // ==== SUGGESTIONS POUR /rewards admin day [?] ====
+            if (args.length == 3 && args[1].equalsIgnoreCase("day")) {
+                return filter(args[2], Arrays.asList("1", "7", "30"));
+            }
+
+            // ==== SUGGESTIONS POUR /rewards admin set [joueur] [?] ====
+            if (args.length == 4 && args[1].equalsIgnoreCase("set")) {
+                return filter(args[3], Arrays.asList("1", "7", "30"));
+            }
         }
+
         return completions;
     }
 

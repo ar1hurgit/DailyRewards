@@ -8,6 +8,9 @@ commands:
     description: Open daily rewards menu
     usage: /rewards [admin]
 permissions:
-  dailyrewards.admin:
-    description: Access to admin commands
+  dailyrewards.admin.*:
+    description: Access to all admin commands
     default: op
+    children:
+      dailyrewards.admin.set: true
+      dailyrewards.admin.day: true

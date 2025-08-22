@@ -1,5 +1,6 @@
 package Reward;
 
+import Reward.Listener.PlayerJoinListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -10,8 +11,10 @@ public class Rewards extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
-
         PlayerDataManager playerDataManager = new PlayerDataManager(this);
+
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this, playerDataManager), this);
+
         RewardManager rewardManager = new RewardManager(this, playerDataManager);
         GUIManager guiManager = new GUIManager(this, playerDataManager, rewardManager);
 
@@ -23,6 +26,4 @@ public class Rewards extends JavaPlugin {
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, rewardManager::checkDailyReset, 0L, 20L * 60 * 60);
     }
-
-
 }

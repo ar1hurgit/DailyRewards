@@ -14,17 +14,41 @@ messages:
   invalid-order: "&cVous devez réclamer les jours dans l'ordre !"
   wait-message: "&eRevenez dans {time} heures !"
 
+
+
+
+
+# Configuration de la monnaie
+# monney: "none" - Désactiver le système d'argent
+# monney: "vault" - Utiliser le système d'argent Vault (EssentialsX)
+# monney: "PlayerPoints" - Utiliser PlayerPoints
+# monney: "CoinsEngine" - Utiliser CoinsEngine
+# monney: "ultraeconomy" - Utiliser UltraEconomy
+# ultraeconomy:
+#   currency: "default" # Nom de la monnaie (par défaut: default)
+# monney: "VotingPlugin" - Utiliser VotingPlugin
+
+monney: "vault"  # Par défaut, Vault (EssentialsX)
+
+
+
 # Récompenses
 rewards:
   day-1:
-    - "eco give {player} 1000"
+    - "give {player} diamond 1"
   day-7:
-    - "eco give {player} 5000"
     - "give {player} diamond 1"
   day-30:
-    - "eco give {player} 10000"
     - "give {player} diamond_block 1"
 
-  reset:
-    enabled: true
-    delay: 1
+
+
+
+
+reset:
+  enabled: true
+  delay: 1
+
+ultraeconomy:
+
+  currency: "default"

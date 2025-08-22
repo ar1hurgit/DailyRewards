@@ -28,8 +28,11 @@ public class GUIManager implements Listener {
     }
 
     public void openRewardsGUI(Player player, int page) {
+
         int totalDays = plugin.getConfig().getInt("total-days");
+
         int itemsPerPage = rewardSlots.length;
+
         int totalPages = (int) Math.ceil((double) totalDays / itemsPerPage);
 
         Inventory gui = Bukkit.createInventory(new RewardsHolder(page), 54,
@@ -37,12 +40,18 @@ public class GUIManager implements Listener {
                         .replace("{page}", String.valueOf(page + 1))
                         .replace("{max}", String.valueOf(totalPages)));
 
+
+
+        // Fond gris
         ItemStack bg = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta bgMeta = bg.getItemMeta();
         bgMeta.setDisplayName(" ");
         bg.setItemMeta(bgMeta);
         for (int i = 45; i < 54; i++) gui.setItem(i, bg);
 
+
+
+        // Récompenses
         String uuid = player.getUniqueId().toString();
         int currentDay = playerData.getDay(uuid);
         String lastClaimStr = playerData.getLastClaim(uuid);
@@ -52,11 +61,18 @@ public class GUIManager implements Listener {
             if (day > totalDays) break;
             gui.setItem(rewardSlots[i], rewardManager.createRewardItem(day, currentDay, lastClaimStr));
         }
-
-        if (page > 0) gui.setItem(45, Utils.createItem(Material.ARROW, plugin.getConfig().getString("gui.navigation.previous")));
-        if (page < totalPages - 1) gui.setItem(53, Utils.createItem(Material.ARROW, plugin.getConfig().getString("gui.navigation.next")));
+        // Navigation
+        if (page < 0) page = 0;
+        if (page >= totalPages) page = totalPages - 1;
+        if (page > 0) {
+            gui.setItem(45, Utils.createItem(Material.ARROW, plugin.getConfig().getString("gui.navigation.previous")));
+        }
+        if (page < totalPages - 1 && totalPages > 1) {
+            gui.setItem(53, Utils.createItem(Material.ARROW, plugin.getConfig().getString("gui.navigation.next")));
+        }
 
         player.openInventory(gui);
+
     }
 
     @EventHandler
@@ -66,11 +82,20 @@ public class GUIManager implements Listener {
         if (!(event.getWhoClicked() instanceof Player player)) return;
         int slot = event.getSlot();
 
-        if (slot == 45 && holder.getPage() > 0) {
-            openRewardsGUI(player, holder.getPage() - 1);
-        } else if (slot == 53) {
-            openRewardsGUI(player, holder.getPage() + 1);
-        } else if (slot >= 0 && slot < 45) {
+        int totalDays = plugin.getConfig().getInt("total-days");
+        int itemsPerPage = rewardSlots.length;
+        int totalPages = (int) Math.ceil((double) totalDays / itemsPerPage);
+        int currentPage = holder.getPage();
+
+        if (slot == 45) { // Précédent
+            if (currentPage > 0) {
+                openRewardsGUI(player, currentPage - 1);
+            }
+        } else if (slot == 53) { // Suivant
+            if (currentPage < totalPages - 1) {
+                openRewardsGUI(player, currentPage + 1);
+            }
+        } else if (slot >= 0 && slot < 45) { // Clic sur une récompense
             rewardManager.handleRewardClaim(player, event.getCurrentItem());
         }
     }
