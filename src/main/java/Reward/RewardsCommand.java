@@ -7,15 +7,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class RewardsCommand implements CommandExecutor {
-
     private final Rewards plugin;
     private final GUIManager guiManager;
     private final PlayerDataManager playerData;
@@ -33,56 +32,45 @@ public class RewardsCommand implements CommandExecutor {
         plugin.getLogger().info("[DailyRewards] Reset Config - Delay (days): " + plugin.getConfig().getInt("reset.delay", 1));
 
         // ==== GESTION DES COMMANDES ADMIN ====
-        if (args.length > 0) {
-            if (args[0].equalsIgnoreCase("admin")) {
-                if (args.length == 1) {
-                    // ==== VÉRIFICATION : AU MOINS UNE PERMISSION ADMIN ====
-                    if (!sender.hasPermission("dailyrewards.admin.*")
-                            && !sender.hasPermission("dailyrewards.admin.set")
-                            && !sender.hasPermission("dailyrewards.admin.day")) {
-                        sender.sendMessage(Utils.color("&cYou don't have permission to use this command!"));
-                        return true;
-                    }
-                    sendAdminHelp(sender);
+        if (args.length > 0 && args[0].equalsIgnoreCase("admin")) {
+            if (args.length == 1) {
+                if (!checkAdminPermissions(sender)) {
+                    sender.sendMessage(Utils.color("&cYou don't have permission!"));
                     return true;
                 }
+                sendAdminHelp(sender);
+                return true;
+            }
 
-                switch (args[1].toLowerCase()) {
-                    case "set":
-                        // ==== VÉRIFICATION : PERMISSION SPÉCIFIQUE OU GLOBALE ====
-                        if (!sender.hasPermission("dailyrewards.admin.*")
-                                && !sender.hasPermission("dailyrewards.admin.set")) {
-                            sender.sendMessage(Utils.color("&cYou don't have permission to use this subcommand!"));
-                            return true;
-                        }
-                        plugin.getLogger().info("[DailyRewards] Admin " + sender.getName() + " used /rewards admin set");
-                        boolean setResult = handleSetCommand(sender, args);
-                        plugin.getLogger().info("[DailyRewards] Set command result: " + setResult);
-                        return setResult;
-
-                    case "day":
-                        // ==== VÉRIFICATION : PERMISSION SPÉCIFIQUE OU GLOBALE ====
-                        if (!sender.hasPermission("dailyrewards.admin.*")
-                                && !sender.hasPermission("dailyrewards.admin.day")) {
-                            sender.sendMessage(Utils.color("&cYou don't have permission to use this subcommand!"));
-                            return true;
-                        }
-                        return handleDayCommand(sender, args);
-
-                    default:
-                        sender.sendMessage(Utils.color("&cUnknown admin subcommand!"));
-                        sendAdminHelp(sender);
-                        return true;
-                }
+            switch (args[1].toLowerCase()) {
+                case "set":
+                    return handleSetCommand(sender, args);
+                case "day":
+                    return handleDayCommand(sender, args);
+                default:
+                    sender.sendMessage(Utils.color("&cUnknown subcommand!"));
+                    return true;
             }
         }
 
-        // ==== VÉRIFICATION QUE L'EXPÉDITEUR EST UN JOUEUR ====
+        // ==== VÉRIFICATION QUE L'EXPÉDITEUR EST UN JOUEUR POUR LES COMMANDES NON-ADMIN ====
         if (!(sender instanceof Player)) {
             sender.sendMessage(Utils.color("&cOnly players can use this command!"));
             return true;
         }
 
+        // ==== GESTION DES COMMANDES JOUEUR ====
+        if (args.length > 0) {
+            switch (args[0].toLowerCase()) {
+                case "get":
+                    return handleGetCommand(sender, args);
+                case "baltop":
+                case "bal":
+                    return handleBaltopCommand(sender);
+            }
+        }
+
+        // ==== CODE ORIGINAL POUR LES JOUEURS ====
         Player player = (Player) sender;
         String uuid = player.getUniqueId().toString();
         plugin.getLogger().info("[DailyRewards] Player UUID: " + uuid);
@@ -98,43 +86,30 @@ public class RewardsCommand implements CommandExecutor {
         int delayDays = plugin.getConfig().getInt("reset.delay", 1);
         boolean resetEnabled = plugin.getConfig().getBoolean("reset.enabled", true);
 
-        // ==== VÉRIFICATION SI LE JOUEUR EST DANS LA BASE DE DONNÉES ====
         if (lastClaimStr == null || lastClaimStr.isEmpty()) {
-            player.sendMessage(Utils.color("&cYour data is not initialized. Please reconnect to the server!"));
-            return true; // Arrête l'exécution du reste du code
+            player.sendMessage(Utils.color("&cYour data is not initialized. Please reconnect!"));
+            return true;
         }
 
         // ==== PARSING DE LA DERNIÈRE RÉCLAMATION ====
         LocalDateTime lastClaim;
         try {
             lastClaim = LocalDateTime.parse(lastClaimStr);
-            plugin.getLogger().info("[DailyRewards] Parsed Last Claim: " + lastClaim);
         } catch (DateTimeParseException e) {
-            plugin.getLogger().warning("[DailyRewards] Invalid date format for " + player.getName() + ": " + lastClaimStr);
-            player.sendMessage(Utils.color("&cError loading your rewards data. Please reconnect!"));
-            return true; // Arrête l'exécution du reste du code
+            plugin.getLogger().warning("[DailyRewards] Invalid date format for " + player.getName());
+            player.sendMessage(Utils.color("&cError loading your data. Please reconnect!"));
+            return true;
         }
 
         // ==== CALCUL DE LA PROCHAINE RÉINITIALISATION ====
-        LocalDateTime nextMidnight = lastClaim.toLocalDate().plusDays(delayDays).atStartOfDay();
-        boolean shouldReset = resetEnabled && now.isAfter(nextMidnight);
-
-        // ==== DEBUG: Détails de la réinitialisation ====
-        plugin.getLogger().info("[DailyRewards] Reset Details:");
-        plugin.getLogger().info("  - Player: " + player.getName());
-        plugin.getLogger().info("  - Last Claim: " + lastClaim);
-        plugin.getLogger().info("  - Next Midnight: " + nextMidnight);
-        plugin.getLogger().info("  - Now: " + now);
-        plugin.getLogger().info("  - Should Reset: " + shouldReset);
+        LocalDateTime nextReset = lastClaim.plusDays(delayDays);
+        boolean shouldReset = resetEnabled && now.isAfter(nextReset);
 
         if (shouldReset) {
-            // ==== RÉINITIALISATION ====
-            playerData.setDay(uuid, 0); // Réinitialise à Jour 1
-            LocalDateTime newLastClaim = now.minusDays(1).toLocalDate().atStartOfDay();
-            playerData.setLastClaim(uuid, newLastClaim.toString());
+            playerData.setDay(uuid, 0);
+            playerData.setLastClaim(uuid, now.minusDays(1).toString());
             player.sendMessage(Utils.color("&4Your progress has been reset to Day 1!"));
             page = 0;
-            plugin.getLogger().info("[DailyRewards] Reset triggered for " + player.getName() + ". Next reset: " + newLastClaim);
         }
 
         // ==== OUVERTURE DE L'INTERFACE ====
@@ -142,35 +117,91 @@ public class RewardsCommand implements CommandExecutor {
         return true;
     }
 
+    private boolean handleAdminCommand(CommandSender sender, String[] args) {
+        if (args.length == 1) {
+            if (!checkAdminPermissions(sender)) {
+                sender.sendMessage(Utils.color("&cYou don't have permission!"));
+                return true;
+            }
+            sendAdminHelp(sender);
+            return true;
+        }
+
+        switch (args[1].toLowerCase()) {
+            case "set":
+                return handleSetCommand(sender, args);
+            case "day":
+                return handleDayCommand(sender, args);
+            default:
+                sender.sendMessage(Utils.color("&cUnknown subcommand!"));
+                return true;
+        }
+    }
+
+    private boolean checkAdminPermissions(CommandSender sender) {
+        return sender.hasPermission("dailyrewards.admin.*") ||
+                sender.hasPermission("dailyrewards.admin.set") ||
+                sender.hasPermission("dailyrewards.admin.day");
+    }
+
+    private void handleResetLogic(Player player, String uuid) {
+        String lastClaimStr = playerData.getLastClaim(uuid);
+        LocalDateTime now = LocalDateTime.now();
+        int delayDays = plugin.getConfig().getInt("reset.delay", 1);
+        boolean resetEnabled = plugin.getConfig().getBoolean("reset.enabled", true);
+
+        if (lastClaimStr == null || lastClaimStr.isEmpty()) {
+            player.sendMessage(Utils.color("&cData not initialized! Reconnect."));
+            return;
+        }
+
+        try {
+            LocalDateTime lastClaim = LocalDateTime.parse(lastClaimStr);
+            LocalDateTime nextReset = lastClaim.plusDays(delayDays);
+
+            if (resetEnabled && now.isAfter(nextReset)) {
+                playerData.setDay(uuid, 0);
+                playerData.setLastClaim(uuid, now.minusDays(1).toString());
+                player.sendMessage(Utils.color("&4Progress reset to Day 1!"));
+            }
+        } catch (DateTimeParseException e) {
+            plugin.getLogger().warning("Invalid date format for " + player.getName());
+            player.sendMessage(Utils.color("&cData error! Reconnect."));
+        }
+    }
+
     private boolean handleSetCommand(CommandSender sender, String[] args) {
         if (args.length < 4) {
             sender.sendMessage(Utils.color("&cUsage: /rewards admin set <player> <day>"));
             return false;
         }
+
         Player target = Bukkit.getPlayer(args[2]);
         if (target == null) {
-            sender.sendMessage(Utils.color("&cPlayer not found"));
+            sender.sendMessage(Utils.color("&cPlayer not found!"));
             return false;
         }
+
         try {
             int day = Integer.parseInt(args[3]);
             if (day <= 0) {
-                sender.sendMessage(Utils.color("&cDay must be greater than 0"));
+                sender.sendMessage(Utils.color("&cInvalid day!"));
                 return false;
             }
+
             playerData.setDay(target.getUniqueId().toString(), day - 1);
             playerData.setLastClaim(target.getUniqueId().toString(), LocalDateTime.now().minusDays(1).toString());
             sender.sendMessage(Utils.color("&aSet " + target.getName() + " to day " + day));
             return true;
         } catch (NumberFormatException e) {
-            sender.sendMessage(Utils.color("&cInvalid day number"));
+            sender.sendMessage(Utils.color("&cInvalid number!"));
             return false;
         }
     }
 
     private boolean handleDayCommand(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(Utils.color("&cOnly players can use this command!"));
+            sender.sendMessage(Utils.color("&cPlayers only!"));
             return false;
         }
 
@@ -178,10 +209,9 @@ public class RewardsCommand implements CommandExecutor {
         boolean isNone = moneySystem != null && moneySystem.equalsIgnoreCase("none");
 
         if ((isNone && args.length < 3) || (!isNone && args.length < 4)) {
-            String usage = isNone
-                    ? "&cUsage: /rewards admin day <day>"
-                    : "&cUsage: /rewards admin day <day> <amount> ";
-            sender.sendMessage(Utils.color(usage));
+            sender.sendMessage(Utils.color(isNone ?
+                    "&cUsage: /rewards admin day <day>" :
+                    "&cUsage: /rewards admin day <day> <amount>"));
             return false;
         }
 
@@ -192,37 +222,75 @@ public class RewardsCommand implements CommandExecutor {
             if (!isNone) {
                 double amount = Double.parseDouble(args[3]);
                 String moneyCmd = buildMoneyCommand(moneySystem, amount);
-                if (moneyCmd != null && !moneyCmd.isEmpty()) {
-                    commands.add(moneyCmd);
-                }
+                if (!moneyCmd.isEmpty()) commands.add(moneyCmd);
             }
 
-            int extraCmdIndex = isNone ? 3 : 4;
-            if (args.length > extraCmdIndex) {
-                commands.add(args[extraCmdIndex]);
+            if (args.length > 3) {
+                commands.add(args[3]);
             } else {
-                Player admin = (Player) sender;
-                ItemStack itemInHand = admin.getInventory().getItemInMainHand();
-                if (itemInHand != null && !itemInHand.getType().isAir()) {
-                    String serialized = Utils.serializeItemStack(itemInHand);
-                    if (serialized !=null) {
-                        commands.add("item:" + serialized);
-                    }
+                ItemStack item = ((Player) sender).getInventory().getItemInMainHand();
+                if (item != null && !item.getType().isAir()) {
+                    String serialized = Utils.serializeItemStack(item);
+                    if (serialized != null) commands.add("item:" + serialized);
                 }
             }
 
             plugin.getConfig().set("rewards.day-" + day, commands);
             plugin.saveConfig();
-            sender.sendMessage(Utils.color("&aReward for day " + day + " set!"));
+            sender.sendMessage(Utils.color("&aReward set for day " + day));
             return true;
         } catch (NumberFormatException e) {
-            sender.sendMessage(Utils.color("&cInvalid number format!"));
+            sender.sendMessage(Utils.color("&cInvalid number!"));
             return false;
         }
     }
+    private boolean handleGetCommand(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("dailyrewards.get")) {
+            sender.sendMessage(Utils.color("&cYou don't have permission!"));
+            return true;
+        }
 
-    private String buildMoneyCommand(String moneySystem, double amount) {
-        switch (moneySystem.toLowerCase()) {
+        if (args.length < 2) {
+            sender.sendMessage(Utils.color("&cUsage: /rewards get <player>"));
+            return false;
+        }
+
+        Player target = Bukkit.getPlayer(args[1]);
+        if (target == null) {
+            sender.sendMessage(Utils.color("&cPlayer not found!"));
+            return false;
+        }
+
+        int day = playerData.getDay(target.getUniqueId().toString());
+        sender.sendMessage(Utils.color("&a" + target.getName() +
+                " is on " + Utils.getOrdinal(day) + " day!"));
+        return true;
+    }
+
+    private boolean handleBaltopCommand(CommandSender sender) {
+        if (!sender.hasPermission("dailyrewards.baltop")) {
+            sender.sendMessage(Utils.color("&cYou don't have permission!"));
+            return true;
+        }
+
+        Map<UUID, Integer> allPlayers = playerData.getAllPlayerDays();
+
+        // Sort players by day descending
+        List<Map.Entry<UUID, Integer>> sorted = new ArrayList<>(allPlayers.entrySet());
+        sorted.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
+
+        sender.sendMessage(Utils.color("&4&lTop 10 Players:"));
+        for (int i = 0; i < Math.min(10, sorted.size()); i++) {
+            Map.Entry<UUID, Integer> entry = sorted.get(i);
+            String name = Bukkit.getOfflinePlayer(entry.getKey()).getName();
+            sender.sendMessage(Utils.color("&6#" + (i+1) + " &e" +
+                    (name != null ? name : "Unknown") + " &7- " +
+                    Utils.getOrdinal(entry.getValue())));
+        }
+        return true;
+    }
+    private String buildMoneyCommand(String system, double amount) {
+        switch (system.toLowerCase()) {
             case "vault":
             case "essentialsx":
                 return "eco give {player} " + amount;
@@ -232,24 +300,17 @@ public class RewardsCommand implements CommandExecutor {
                 return "coins give {player} " + amount;
             case "ultraeconomy":
                 String currency = plugin.getConfig().getString("ultraeconomy.currency", "default");
-                if (currency == null || currency.isEmpty()) currency = "default";
-                return "addbalance {player} " + currency + " " + amount;
+                return "addbalance {player} " + (currency.isEmpty() ? "default" : currency) + " " + amount;
             case "votingplugin":
                 return "av User {player} AddPoints " + amount;
-            case "none":
-                return "" ;
             default:
-                return "eco give {player} " + amount;
+                return "";
         }
     }
 
     private void sendAdminHelp(CommandSender sender) {
-        String moneySystem = plugin.getConfig().getString("monney", "vault");
-        boolean isNone = moneySystem != null&& moneySystem.equalsIgnoreCase("none");
         sender.sendMessage(Utils.color("&6Admin Commands:"));
-        sender.sendMessage(Utils.color("&e/rewards admin set <player> <day> &7- Set player's day"));
-        sender.sendMessage(Utils.color(isNone
-                ? "&e/rewards admin day <day>&7- Set day reward"
-                : "&e/rewards admin day <day> <amount> &7- Set day reward"));
+        sender.sendMessage(Utils.color("&e/rewards admin set <player> <day> &7- Set player day"));
+        sender.sendMessage(Utils.color("&e/rewards admin day <day> [amount] &7- Configure rewards"));
     }
 }

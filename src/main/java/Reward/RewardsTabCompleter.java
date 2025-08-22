@@ -18,50 +18,62 @@ public class RewardsTabCompleter implements TabCompleter {
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String alias, String[] args) {
         List<String> completions = new ArrayList<>();
 
-        // ==== VÉRIFICATION GLOBALE : LE JOUEUR A-T-IL UNE PERMISSION ADMIN ? ====
+        // ==== GESTION DES COMMANDES ADMIN ====
         boolean hasAdminPermission = sender.hasPermission("dailyrewards.admin.*")
                 || sender.hasPermission("dailyrewards.admin.set")
                 || sender.hasPermission("dailyrewards.admin.day");
-        // ==== SI PAS DE PERMISSION, ON RENVOIE RIEN ====
-        if (!hasAdminPermission) {
-            return completions;
-        }
 
-        // ==== SUGGESTION POUR LE PREMIER ARGUMENT ====
         if (args.length == 1) {
-            completions.add("admin");
+            // Suggest admin commands if has permission
+            if (hasAdminPermission) {
+                completions.add("admin");
+            }
+
+            // Suggest player commands if has permissions
+            if (sender.hasPermission("dailyrewards.get")) {
+                completions.add("get");
+            }
+            if (sender.hasPermission("dailyrewards.baltop")) {
+                completions.add("baltop");
+                completions.add("bal"); // Short version
+            }
             return filter(args[0], completions);
         }
 
-        // ==== SUGGESTIONS POUR /rewards admin ====
-        if (args[0].equalsIgnoreCase("admin")) {
+        // ==== GESTION DES SOUS-COMMANDES ADMIN ====
+        if (hasAdminPermission && args[0].equalsIgnoreCase("admin")) {
             if (args.length == 2) {
                 List<String> subCommands = new ArrayList<>();
-                if (sender.hasPermission("dailyrewards.admin.*") || sender.hasPermission("dailyrewards.admin.set")) {
-                    subCommands.add("set");
-                }
-                if (sender.hasPermission("dailyrewards.admin.*") || sender.hasPermission("dailyrewards.admin.day")) {
-                    subCommands.add("day");
-                }
+                if (sender.hasPermission("dailyrewards.admin.set")) subCommands.add("set");
+                if (sender.hasPermission("dailyrewards.admin.day")) subCommands.add("day");
                 return filter(args[1], subCommands);
             }
 
-            // ==== SUGGESTIONS POUR /rewards admin set [?] ====
+            // /rewards admin set [player]
             if (args.length == 3 && args[1].equalsIgnoreCase("set")) {
                 return filter(args[2], Bukkit.getOnlinePlayers().stream().map(Player::getName).toList());
             }
 
-            // ==== SUGGESTIONS POUR /rewards admin day [?] ====
+            // /rewards admin day [day]
             if (args.length == 3 && args[1].equalsIgnoreCase("day")) {
-                return filter(args[2], Arrays.asList("1", "7", "30"));
+                return filter(args[2], Arrays.asList("1", "7", "14", "30"));
             }
 
-            // ==== SUGGESTIONS POUR /rewards admin set [joueur] [?] ====
+            // /rewards admin set [player] [day]
             if (args.length == 4 && args[1].equalsIgnoreCase("set")) {
-                return filter(args[3], Arrays.asList("1", "7", "30"));
+                return filter(args[3], Arrays.asList("1", "7", "14", "30"));
             }
         }
 
+        // ==== GESTION DES COMMANDES JOUEUR ====
+        if (args[0].equalsIgnoreCase("get") && sender.hasPermission("dailyrewards.get")) {
+            if (args.length == 2) {
+                // Suggest online players for /rewards get
+                return filter(args[1], Bukkit.getOnlinePlayers().stream().map(Player::getName).toList());
+            }
+        }
+
+        // No more completions for baltop (no arguments needed)
         return completions;
     }
 

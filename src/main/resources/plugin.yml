@@ -6,11 +6,31 @@ authors: [ar1hurgit]
 commands:
   rewards:
     description: Open daily rewards menu
-    usage: /rewards [admin]
+    usage: /rewards [admin|get|baltop]
+    permission: dailyrewards.use
+    aliases: [rewards]
 permissions:
+
+  dailyrewards.use:
+    description: Base permission for daily rewards
+    default: true
+    children:
+      dailyrewards.get: true
+      dailyrewards.baltop: true
+
+
+
+  dailyrewards.get:
+    description: Allows checking player's reward day
+    default: true
+
+  dailyrewards.baltop:
+    description: Allows viewing the leaderboard
+    default: true
+
   dailyrewards.admin.*:
     description: Access to all admin commands
     default: op
     children:
-      dailyrewards.admin.set: true
       dailyrewards.admin.day: true
+      dailyrewards.admin.set: true
