@@ -1,8 +1,8 @@
 name: DailyRewards
-version: 1.0.5
+version: 1.1.2
 main: Reward.Rewards
 api-version: "1.21"
-authors: [ar1hurgit]
+authors: [black hole studio - ar1hurgit]
 commands:
   rewards:
     description: Open daily rewards menu
