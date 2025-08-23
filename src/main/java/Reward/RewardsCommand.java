@@ -16,6 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import Reward.PlayerDataManager;
+import Reward.Rewards;
+import Reward.RewardManager;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 
 public class RewardsCommand implements CommandExecutor {
     private final Rewards plugin;
@@ -118,6 +124,7 @@ public class RewardsCommand implements CommandExecutor {
         // ==== OUVERTURE DE L'INTERFACE ====
         guiManager.openRewardsGUI(player, page);
         return true;
+
     }
 
     private boolean handleSetCommand(CommandSender sender, String[] args) {
@@ -138,8 +145,8 @@ public class RewardsCommand implements CommandExecutor {
 
         try {
             int day = Integer.parseInt(args[3]); // args[3] for day
-            if (day <= 0) {
-                sender.sendMessage(Utils.color("&cInvalid day! Must be at least 1."));
+            if (day <= -1) {
+                sender.sendMessage(Utils.color("&cInvalid day! Must be at least 0."));
                 return false;
             }
 
@@ -232,5 +239,48 @@ public class RewardsCommand implements CommandExecutor {
         sender.sendMessage(Utils.color("&6Admin Commands:"));
         sender.sendMessage(Utils.color("&e/rewards admin set <player> <day> &7- Set player day"));
         sender.sendMessage(Utils.color("&e/rewards admin day <day> [amount] &7- Configure rewards"));
+    }
+    private String getTopPlayersDebug() {
+        // Version simplifiée pour le debug
+        return "Top1: JoueurTest: 10 | Top2: AutreJoueur: 8";
+    }
+    private void testPlaceholders(CommandSender sender, Player player) {
+        sender.sendMessage("§6=== Debug Placeholders ===");
+        sender.sendMessage("§eJoueur: §f" + player.getName());
+        sender.sendMessage("§eUUID: §f" + player.getUniqueId());
+        sender.sendMessage("");
+
+        // Utiliser l'instance de playerDataManager (non statique)
+        int currentDay = playerData.getPlayerday(player.getUniqueId());
+
+        sender.sendMessage("§b%dailyrewards_player%: §f" + currentDay);
+        sender.sendMessage("§b%dailyrewards_player_name%: §f" + player.getName());
+
+        // Pour le top players, utilisez aussi l'instance
+        String topPlayers = getTopPlayersDebug();
+        sender.sendMessage("§b%dailyrewards_bal%: §f" + topPlayers);
+        sender.sendMessage("§b%dailyrewards_current%: §fRécompense jour " + currentDay);
+
+        sender.sendMessage("");
+        sender.sendMessage("§aPlaceholders testés avec succès !");
+    }
+    private void handlePlaceholderDebug(CommandSender sender, String[] args) {
+        Player targetPlayer;
+
+        if (args.length >= 3) {
+            targetPlayer = Bukkit.getPlayer(args[2]);
+            if (targetPlayer == null) {
+                sender.sendMessage("§cJoueur non trouvé ou hors ligne.");
+                return;
+            }
+        } else if (sender instanceof Player) {
+            targetPlayer = (Player) sender;
+        } else {
+            sender.sendMessage("§cVous devez spécifier un joueur depuis la console.");
+            return;
+        }
+
+        // Tester tous les placeholders
+        testPlaceholders(sender, targetPlayer);
     }
 }

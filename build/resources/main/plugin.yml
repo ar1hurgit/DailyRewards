@@ -1,5 +1,5 @@
 name: DailyRewards
-version: 1.0.5
+version: 1.1.2
 main: Reward.Rewards
 api-version: "1.21"
 authors: [black hole studio - ar1hurgit]
@@ -10,15 +10,12 @@ commands:
     permission: dailyrewards.use
     aliases: [rewards]
 permissions:
-
   dailyrewards.use:
     description: Base permission for daily rewards
     default: true
     children:
       dailyrewards.get: true
       dailyrewards.baltop: true
-
-
 
   dailyrewards.get:
     description: Allows checking player's reward day
@@ -34,3 +31,9 @@ permissions:
     children:
       dailyrewards.admin.day: true
       dailyrewards.admin.set: true
+      dailyrewards.admin.debug: true
+
+
+
+
+softdepend: ["PlaceholderAPI"]

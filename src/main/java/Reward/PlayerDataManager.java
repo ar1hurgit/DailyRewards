@@ -33,6 +33,7 @@ public class PlayerDataManager {
         playerData = YamlConfiguration.loadConfiguration(dataFile);
     }
 
+
     private void saveData() {
         try {
             playerData.save(dataFile);
@@ -86,4 +87,61 @@ public class PlayerDataManager {
         }
         return playerDays;
     }
+    public int getPlayerDay(UUID uuid) {
+        return getDay(uuid.toString());
+    }
+    public void reload() {
+        loadData();
+    }
+    public int getPlayerday(UUID uuid) {
+        String uuidString = uuid.toString();
+        String uuidWithoutDashes = uuidString.replace("-", "");
+
+        // Essayer d'abord avec le format sans tirets (le plus probable)
+        if (playerData.contains(uuidWithoutDashes + ".day")) {
+            return playerData.getInt(uuidWithoutDashes + ".day", 1);
+        }
+        // Sinon essayer avec le format avec tirets
+        else if (playerData.contains(uuidString + ".day")) {
+            return playerData.getInt(uuidString + ".day", 1);
+        }
+        // Par défaut
+        return 1;
+    }
+
+    public List<PlayerData> getTopPlayers(int limit) {
+        List<PlayerData> topPlayers = new ArrayList<>();
+        // Implémentation pour récupérer les meilleurs joueurs
+        for (String key : playerData.getKeys(false)) {
+            try {
+                UUID uuid = UUID.fromString(key);
+                int claims = playerData.getInt(key + ".totalClaims", 0);
+                topPlayers.add(new PlayerData(uuid, claims));
+            } catch (IllegalArgumentException ignored) {}
+        }
+
+        topPlayers.sort((a, b) -> Integer.compare(b.getTotalClaims(), a.getTotalClaims()));
+        return topPlayers.subList(0, Math.min(limit, topPlayers.size()));
+    }
+
+    // Classe interne pour les données joueur
+    public static class PlayerData {
+        private final UUID uuid;
+        private final int totalClaims;
+
+        public PlayerData(UUID uuid, int totalClaims) {
+            this.uuid = uuid;
+            this.totalClaims = totalClaims;
+        }
+
+        public UUID getUuid() {
+            return uuid;
+        }
+
+        public int getTotalClaims() {
+            return totalClaims;
+        }
+    }
+
+
 }

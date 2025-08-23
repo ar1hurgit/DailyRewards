@@ -16,7 +16,7 @@ public class PlayerJoinListener implements Listener {
     public PlayerJoinListener(Rewards plugin, PlayerDataManager playerData) {
         this.plugin = plugin;
         this.playerData = playerData;
-        plugin.getLogger().info("[DailyRewards] PlayerJoinListener initialized with PlayerDataManager");
+        plugin.getLogger().info("PlayerJoinListener initialized with PlayerDataManager");
     }
 
     @EventHandler
@@ -25,24 +25,24 @@ public class PlayerJoinListener implements Listener {
         String uuid = player.getUniqueId().toString();
         String playerName = player.getName();
 
-        plugin.getLogger().info("[DailyRewards] Processing join event for player: " + playerName + " (" + uuid + ")");
+        plugin.getLogger().info("Processing join event for player: " + playerName + " (" + uuid + ")");
 
         try {
             if (!playerData.hasPlayerData(uuid)) {
-                plugin.getLogger().info("[DailyRewards] New player detected: " + playerName + " (" + uuid + ")");
+                plugin.getLogger().info("New player detected: " + playerName + " (" + uuid + ")");
 
                 // Initialize new player data
                 playerData.setDay(uuid, 0);
                 LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
                 playerData.setLastClaim(uuid, yesterday.toLocalDate().atStartOfDay().toString());
 
-                plugin.getLogger().info("[DailyRewards] Successfully initialized data for new player: " + playerName);
+                plugin.getLogger().info("Successfully initialized data for new player: " + playerName);
             } else {
-                plugin.getLogger().info("[DailyRewards] Returning player detected: " + playerName + " (" + uuid + ")");
+                plugin.getLogger().info(" Returning player detected: " + playerName + " (" + uuid + ")");
                 // Optional: You could add checks for daily reward availability here
             }
         } catch (Exception e) {
-            plugin.getLogger().severe("[DailyRewards] Error processing join event for player " + playerName + ": " + e.getMessage());
+            plugin.getLogger().severe("Error processing join event for player " + playerName + ": " + e.getMessage());
             e.printStackTrace();
         }
     }

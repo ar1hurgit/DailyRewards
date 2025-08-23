@@ -56,8 +56,8 @@ public class RewardsTabCompleter implements TabCompleter {
             if (sender.hasPermission("dailyrewards.get")) completions.add("get");
             if (sender.hasPermission("dailyrewards.baltop")) {
                 completions.add("baltop");
-                completions.add("bal");
-            }
+                completions.add("bal");}
+
             return filter(args[0], completions);
         }
 
