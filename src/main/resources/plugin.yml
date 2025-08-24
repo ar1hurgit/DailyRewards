@@ -6,7 +6,7 @@ authors: [black hole studio - ar1hurgit]
 commands:
   rewards:
     description: Open daily rewards menu
-    usage: /rewards [admin|get|baltop]
+    usage: /rewards [get|baltop]
     permission: dailyrewards.use
     aliases: [rewards]
 permissions:

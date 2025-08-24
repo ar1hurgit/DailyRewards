@@ -1,6 +1,6 @@
 package Reward;
 
-import Reward.Command.BaltopGUIManager;
+import Reward.Baltop.BaltopGUIManager;
 import Reward.Listener.PlayerJoinListener;
 import Reward.Placeholder.PlaceholderAPI;
 import org.bukkit.Bukkit;

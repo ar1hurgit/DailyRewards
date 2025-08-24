@@ -1,9 +1,8 @@
-package Reward.Command;
+package Reward.Get;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import Reward.PlayerDataManager;
 import Reward.Utils;
 
