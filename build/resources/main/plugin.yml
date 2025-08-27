@@ -27,7 +27,6 @@ permissions:
 
   dailyrewards.admin.*:
     description: Access to all admin commands
-    usage: /rewards admin admin[set|day]
     default: op
     children:
       dailyrewards.admin.day: true

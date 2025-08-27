@@ -1,9 +1,10 @@
-// PlayerDataManager.java
 package Reward;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -33,7 +34,6 @@ public class PlayerDataManager {
         playerData = YamlConfiguration.loadConfiguration(dataFile);
     }
 
-
     private void saveData() {
         try {
             playerData.save(dataFile);
@@ -42,6 +42,41 @@ public class PlayerDataManager {
         }
     }
 
+    // --- Méthodes pour les jours ---
+    public int getDayMoney(int day) {
+        return playerData.getInt("days." + day + ".money", 0);
+    }
+
+    public void setDayMoney(int day, int amount) {
+        playerData.set("days." + day + ".money", amount);
+        saveData();
+    }
+
+    public List<ItemStack> getDayItems(int day) {
+        List<ItemStack> items = new ArrayList<>();
+        if (playerData.contains("days." + day + ".items")) {
+            List<?> rawItems = playerData.getList("days." + day + ".items");
+            if (rawItems != null) {
+                for (Object obj : rawItems) {
+                    if (obj instanceof Map) {
+                        items.add(ItemStack.deserialize((Map<String, Object>) obj));
+                    }
+                }
+            }
+        }
+        return items;
+    }
+
+    public void setDayItems(int day, List<ItemStack> items) {
+        List<Map<String, Object>> serializedItems = new ArrayList<>();
+        for (ItemStack item : items) {
+            serializedItems.add(item.serialize());
+        }
+        playerData.set("days." + day + ".items", serializedItems);
+        saveData();
+    }
+
+    // --- Méthodes existantes ---
     public boolean hasPlayerData(String uuid) {
         return playerData.contains(uuid + ".day");
     }
@@ -87,31 +122,29 @@ public class PlayerDataManager {
         }
         return playerDays;
     }
+
     public int getPlayerDay(UUID uuid) {
         return getDay(uuid.toString());
     }
+
     public void reload() {
         loadData();
     }
+
     public int getPlayerday(UUID uuid) {
         String uuidString = uuid.toString();
         String uuidWithoutDashes = uuidString.replace("-", "");
 
-        // Essayer d'abord avec le format sans tirets (le plus probable)
         if (playerData.contains(uuidWithoutDashes + ".day")) {
             return playerData.getInt(uuidWithoutDashes + ".day", 1);
-        }
-        // Sinon essayer avec le format avec tirets
-        else if (playerData.contains(uuidString + ".day")) {
+        } else if (playerData.contains(uuidString + ".day")) {
             return playerData.getInt(uuidString + ".day", 1);
         }
-        // Par défaut
         return 1;
     }
 
     public List<PlayerData> getTopPlayers(int limit) {
         List<PlayerData> topPlayers = new ArrayList<>();
-        // Implémentation pour récupérer les meilleurs joueurs
         for (String key : playerData.getKeys(false)) {
             try {
                 UUID uuid = UUID.fromString(key);
@@ -124,7 +157,7 @@ public class PlayerDataManager {
         return topPlayers.subList(0, Math.min(limit, topPlayers.size()));
     }
 
-    // Classe interne pour les données joueur
+    // --- Classe interne simplifiée ---
     public static class PlayerData {
         private final UUID uuid;
         private final int totalClaims;
@@ -142,6 +175,4 @@ public class PlayerDataManager {
             return totalClaims;
         }
     }
-
-
 }

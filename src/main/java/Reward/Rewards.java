@@ -1,7 +1,9 @@
 package Reward;
 
 import Reward.Baltop.BaltopGUIManager;
+import Reward.Day.DayGUICommand;
 import Reward.Listener.PlayerJoinListener;
+import Reward.Listener.ChatInputListener;
 import Reward.Placeholder.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -12,6 +14,7 @@ public class Rewards extends JavaPlugin {
 
     private PlayerDataManager playerDataManager;
     private PlaceholderAPI papiExpansion;
+    private DayGUICommand dayGUICommand; // Référence pour gérer les saisies de chat
 
     @Override
     public void onEnable() {
@@ -21,13 +24,21 @@ public class Rewards extends JavaPlugin {
 
         // Enregistrement des événements
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this, playerDataManager), this);
-
         RewardManager rewardManager = new RewardManager(this, playerDataManager);
         GUIManager guiManager = new GUIManager(this, playerDataManager, rewardManager);
         getServer().getPluginManager().registerEvents(guiManager, this);
 
         BaltopGUIManager baltopGuiManager = new BaltopGUIManager(playerDataManager);
         getServer().getPluginManager().registerEvents(baltopGuiManager, this);
+
+        // Enregistrement des événements pour DayGUICommand
+        dayGUICommand = new DayGUICommand(this, playerDataManager);
+        getServer().getPluginManager().registerEvents(dayGUICommand, this);
+        
+        // Enregistrement du listener pour les saisies de chat
+        ChatInputListener chatInputListener = new ChatInputListener(this);
+        getServer().getPluginManager().registerEvents(chatInputListener, this);
+        dayGUICommand.setChatInputListener(chatInputListener);
 
         // Enregistrement des commandes
         RewardsCommand rewardsCommand = new RewardsCommand(this, guiManager, rewardManager, playerDataManager);
@@ -60,5 +71,10 @@ public class Rewards extends JavaPlugin {
     // Getter pour PlayerDataManager si nécessaire ailleurs
     public PlayerDataManager getPlayerDataManager() {
         return playerDataManager;
+    }
+    
+    // Getter pour DayGUICommand
+    public DayGUICommand getDayGUICommand() {
+        return dayGUICommand;
     }
 }

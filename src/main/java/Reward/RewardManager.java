@@ -6,6 +6,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,15 +15,40 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.File;
+import java.io.IOException;
 
 public class RewardManager {
 
     private final Rewards plugin;
     private final PlayerDataManager playerData;
+    private File moneyFile;
+    private FileConfiguration moneyConfig;
 
     public RewardManager(Rewards plugin, PlayerDataManager playerData) {
         this.plugin = plugin;
         this.playerData = playerData;
+        initMoneyStorage();
+    }
+
+    private void initMoneyStorage() {
+        try {
+            moneyFile = new File(plugin.getDataFolder(), "money.yml");
+            if (!moneyFile.exists()) {
+                plugin.getDataFolder().mkdirs();
+                moneyFile.createNewFile();
+            }
+            moneyConfig = YamlConfiguration.loadConfiguration(moneyFile);
+        } catch (IOException e) {
+            plugin.getLogger().severe("[DailyRewards] Failed to initialize money.yml: " + e.getMessage());
+        }
+    }
+
+    private List<String> getMoneyCommandsForDay(int day) {
+        if (moneyConfig == null) initMoneyStorage();
+        String key = "day-" + day + "-commands";
+        List<String> list = moneyConfig.getStringList(key);
+        return list == null ? new ArrayList<>() : new ArrayList<>(list);
     }
 
     public void checkDailyReset() {
@@ -102,6 +129,7 @@ public class RewardManager {
                 return;
             }
 
+            // Exécuter les récompenses d'objets
             for (String command : plugin.getConfig().getStringList("rewards.day-" + day)) {
                 if (command.startsWith("item:")) {
                     ItemStack rewardItem = Utils.deserializeItemStack(command.substring(5));
@@ -109,6 +137,26 @@ public class RewardManager {
                 } else {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
                 }
+            }
+            
+            // Exécuter les commandes personnalisées (y compris l'argent)
+            for (String command : plugin.getConfig().getStringList("rewards.day-" + day + "-commands")) {
+                if (command != null && !command.trim().isEmpty()) {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
+                }
+            }
+
+            // Exécuter les commandes d'argent depuis money.yml
+            List<String> moneyCmds = getMoneyCommandsForDay(day);
+            if (!moneyCmds.isEmpty()) {
+                plugin.getLogger().info("[DailyRewards] Executing " + moneyCmds.size() + " money command(s) from money.yml for day=" + day);
+                for (String command : moneyCmds) {
+                    if (command != null && !command.trim().isEmpty()) {
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
+                    }
+                }
+            } else {
+                plugin.getLogger().info("[DailyRewards] No money commands found in money.yml for day=" + day);
             }
 
             playerData.setDay(uuid, day);

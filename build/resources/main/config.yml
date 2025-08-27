@@ -36,10 +36,15 @@ monney: "vault"  # Par défaut, Vault (EssentialsX)
 rewards:
   day-1:
     - "give {player} diamond 1"
+    - "give {player} bread 5"
+  day-2:
+    - "give {player} iron_ingot 3"
   day-7:
     - "give {player} diamond 1"
+    - "give {player} emerald 2"
   day-30:
     - "give {player} diamond_block 1"
+    - "give {player} netherite_ingot 1"
 
 
 

@@ -51,7 +51,11 @@ public class RewardsCommand implements CommandExecutor {
                 case "set":
                     return new SetCommand(plugin, playerData).execute(sender, args);
                 case "day":
-                    return new DayCommand(plugin).execute(sender, args);
+                    if (args.length < 3) {
+                        sender.sendMessage(Utils.color("&cUsage: /rewards admin day <day>"));
+                        return true;
+                    }
+                    return new DayCommand(plugin).execute(sender, new String[]{args[2]});
                 default:
                     sender.sendMessage(Utils.color("&cUnknown subcommand!"));
                     return true;
@@ -131,6 +135,6 @@ public class RewardsCommand implements CommandExecutor {
     private void sendAdminHelp(CommandSender sender) {
         sender.sendMessage(Utils.color("&6Admin Commands:"));
         sender.sendMessage(Utils.color("&e/rewards admin set <player> <day> &7- Set player day"));
-        sender.sendMessage(Utils.color("&e/rewards admin day <day> [amount] &7- Configure rewards"));
+        sender.sendMessage(Utils.color("&e/rewards admin day <day> &7- Configure rewards for a specific day"));
     }
 }
