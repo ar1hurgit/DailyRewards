@@ -1,10 +1,10 @@
-package Reward;
+package reward;
 
-import Reward.baltop.BaltopGUIManager;
-import Reward.day.DayGUICommand;
-import Reward.listener.PlayerJoinListener;
-import Reward.listener.ChatInputListener;
-import Reward.placeholder.PlaceholderAPI;
+import reward.baltop.BaltopGUIManager;
+import reward.day.DayGUICommand;
+import reward.listener.PlayerJoinListener;
+import reward.listener.ChatInputListener;
+import reward.placeholder.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 

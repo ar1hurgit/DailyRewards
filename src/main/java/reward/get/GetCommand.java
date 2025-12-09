@@ -1,10 +1,10 @@
-package Reward.get;
+package reward.get;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import Reward.PlayerDataManager;
-import Reward.Utils;
+import reward.PlayerDataManager;
+import reward.Utils;
 
 public class GetCommand {
     private final PlayerDataManager playerData;

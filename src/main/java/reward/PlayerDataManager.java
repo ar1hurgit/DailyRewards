@@ -1,4 +1,4 @@
-package Reward;
+package reward;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;

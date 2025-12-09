@@ -1,9 +1,9 @@
-package Reward.baltop;
+package reward.baltop;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import Reward.PlayerDataManager;
-import Reward.Utils;
+import reward.PlayerDataManager;
+import reward.Utils;
 
 public class BaltopCommand {
     private final PlayerDataManager playerData;

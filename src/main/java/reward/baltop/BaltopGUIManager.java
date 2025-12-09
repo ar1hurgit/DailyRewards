@@ -1,4 +1,4 @@
-package Reward.baltop;
+package reward.baltop;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -12,8 +12,8 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import Reward.PlayerDataManager;
-import Reward.Utils;
+import reward.PlayerDataManager;
+import reward.Utils;
 import java.util.*;
 
 public class BaltopGUIManager implements Listener {
@@ -71,18 +71,18 @@ public class BaltopGUIManager implements Listener {
 
     private ItemStack createPlayerHead(UUID uuid, int rank, int day) {
         org.bukkit.plugin.java.JavaPlugin pluginRef =
-                org.bukkit.plugin.java.JavaPlugin.getProvidingPlugin(Reward.Utils.class);
+                org.bukkit.plugin.java.JavaPlugin.getProvidingPlugin(reward.Utils.class);
 
-        ItemStack head = Reward.Utils.getPlayerHead(uuid, pluginRef);
+        ItemStack head = reward.Utils.getPlayerHead(uuid, pluginRef);
         org.bukkit.inventory.meta.ItemMeta meta = head.getItemMeta();
 
-        String name = Reward.Utils.getPlayerName(uuid, pluginRef);
+        String name = reward.Utils.getPlayerName(uuid, pluginRef);
         String display = (name == null || name.isBlank()) ? "§cPlayer #" + rank : name;
 
-        meta.setDisplayName(Reward.Utils.color("&6" + display));
+        meta.setDisplayName(reward.Utils.color("&6" + display));
         meta.setLore(java.util.Arrays.asList(
-                Reward.Utils.color("&7Rank: &4#" + rank),
-                Reward.Utils.color("&7Day: &e" + Reward.Utils.getOrdinal(day))
+                reward.Utils.color("&7Rank: &4#" + rank),
+                reward.Utils.color("&7Day: &e" + reward.Utils.getOrdinal(day))
         ));
         head.setItemMeta(meta);
         return head;

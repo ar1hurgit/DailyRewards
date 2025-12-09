@@ -1,7 +1,7 @@
-package Reward.placeholder;
+package reward.placeholder;
 
-import Reward.PlayerDataManager;
-import Reward.Rewards;
+import reward.PlayerDataManager;
+import reward.Rewards;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;

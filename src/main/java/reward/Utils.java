@@ -1,4 +1,4 @@
-package Reward;
+package reward;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.google.gson.JsonArray;

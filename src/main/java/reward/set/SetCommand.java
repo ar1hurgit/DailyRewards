@@ -1,11 +1,11 @@
-package Reward.set;
+package reward.set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import Reward.PlayerDataManager;
-import Reward.Rewards;
-import Reward.Utils;
+import reward.PlayerDataManager;
+import reward.Rewards;
+import reward.Utils;
 
 import java.time.LocalDateTime;
 

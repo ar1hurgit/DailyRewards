@@ -1,9 +1,9 @@
-package Reward.day;
+package reward.day;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import Reward.Rewards;
-import Reward.Utils;
+import reward.Rewards;
+import reward.Utils;
 
 public class DayCommand {
     private final Rewards plugin;

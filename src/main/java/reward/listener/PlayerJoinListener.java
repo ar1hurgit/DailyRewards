@@ -1,7 +1,7 @@
-package Reward.listener;
+package reward.listener;
 
-import Reward.PlayerDataManager;
-import Reward.Rewards;
+import reward.PlayerDataManager;
+import reward.Rewards;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

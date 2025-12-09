@@ -1,4 +1,4 @@
-package Reward;
+package reward;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;

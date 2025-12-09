@@ -1,4 +1,4 @@
-package Reward.day;
+package reward.day;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -14,9 +14,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
-import Reward.PlayerDataManager;
-import Reward.Utils;
-import Reward.listener.ChatInputListener;
+import reward.PlayerDataManager;
+import reward.Utils;
+import reward.listener.ChatInputListener;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 

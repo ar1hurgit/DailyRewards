@@ -1,11 +1,11 @@
-package Reward;
+package reward;
 
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import Reward.baltop.BaltopCommand;
-import Reward.get.GetCommand;
-import Reward.day.DayCommand;
-import Reward.set.SetCommand;
+import reward.baltop.BaltopCommand;
+import reward.get.GetCommand;
+import reward.day.DayCommand;
+import reward.set.SetCommand;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
