@@ -1,4 +1,4 @@
-package Reward.Day;
+package Reward.day;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -13,12 +13,9 @@ public class DayCommand {
     }
 
     public boolean execute(CommandSender sender, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(Utils.color("&cPlayers only!"));
-            return false;
-        }
+        if (!(sender instanceof Player)) {return false;}
 
-        // Vérification des arguments
+        // check args
         if (args.length < 1) {
             sender.sendMessage(Utils.color("&cUsage: /rewards admin day <day>"));
             return false;
@@ -27,7 +24,7 @@ public class DayCommand {
         try {
             int day = Integer.parseInt(args[0]);
             
-            // Utiliser l'instance existante pour conserver l'état et le listener chat
+            // Use the existing instance to keep the state and the listener chat
             DayGUICommand dayGUI = plugin.getDayGUICommand();
             if (dayGUI == null) {
                 plugin.getLogger().severe("[DailyRewards] DayGUICommand instance is null. Aborting.");
@@ -35,7 +32,7 @@ public class DayCommand {
                 return false;
             }
             String[] guiArgs = new String[]{"admin", "day", String.valueOf(day)};
-            plugin.getLogger().info("[DailyRewards] Opening Day GUI for day=" + day + " for " + sender.getName());
+            plugin.getLogger().info("[DailyRewards] Opening day GUI for day=" + day + " for " + sender.getName());
             return dayGUI.onCommand(sender, plugin.getCommand("rewards"), "rewards", guiArgs);
             
         } catch (NumberFormatException e) {

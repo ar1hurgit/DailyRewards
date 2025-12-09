@@ -1,10 +1,10 @@
 package Reward;
 
-import Reward.Baltop.BaltopGUIManager;
-import Reward.Day.DayGUICommand;
-import Reward.Listener.PlayerJoinListener;
-import Reward.Listener.ChatInputListener;
-import Reward.Placeholder.PlaceholderAPI;
+import Reward.baltop.BaltopGUIManager;
+import Reward.day.DayGUICommand;
+import Reward.listener.PlayerJoinListener;
+import Reward.listener.ChatInputListener;
+import Reward.placeholder.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -14,15 +14,15 @@ public class Rewards extends JavaPlugin {
 
     private PlayerDataManager playerDataManager;
     private PlaceholderAPI papiExpansion;
-    private DayGUICommand dayGUICommand; // Référence pour gérer les saisies de chat
+    private DayGUICommand dayGUICommand;
 
     @Override
     public void onEnable() {
-        // Initialisation du PlayerDataManager avec la variable de classe
+        // Initialisation of the PlayerDataManager
         this.playerDataManager = new PlayerDataManager(this);
         saveDefaultConfig();
 
-        // Enregistrement des événements
+        // event registration
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this, playerDataManager), this);
         RewardManager rewardManager = new RewardManager(this, playerDataManager);
         GUIManager guiManager = new GUIManager(this, playerDataManager, rewardManager);
@@ -31,33 +31,33 @@ public class Rewards extends JavaPlugin {
         BaltopGUIManager baltopGuiManager = new BaltopGUIManager(playerDataManager);
         getServer().getPluginManager().registerEvents(baltopGuiManager, this);
 
-        // Enregistrement des événements pour DayGUICommand
+
         dayGUICommand = new DayGUICommand(this, playerDataManager);
         getServer().getPluginManager().registerEvents(dayGUICommand, this);
         
-        // Enregistrement du listener pour les saisies de chat
+        // listener for chat entries
         ChatInputListener chatInputListener = new ChatInputListener(this);
         getServer().getPluginManager().registerEvents(chatInputListener, this);
         dayGUICommand.setChatInputListener(chatInputListener);
 
-        // Enregistrement des commandes
+        // command registration
         RewardsCommand rewardsCommand = new RewardsCommand(this, guiManager, rewardManager, playerDataManager);
         Objects.requireNonNull(getCommand("rewards")).setExecutor(rewardsCommand);
         Objects.requireNonNull(getCommand("rewards")).setTabCompleter(new RewardsTabCompleter(this));
 
-        // Enregistrement de PlaceholderAPI
+        // PlaceholderAPI
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             papiExpansion = new PlaceholderAPI(this, playerDataManager);
             if (papiExpansion.register()) {
-                getLogger().info("PlaceholderAPI expansion enregistrée !");
+                getLogger().info("PlaceholderAPI enabled ");
 
             }
         }
 
-        // Planification des tâches répétitives
+        // Planning repetitive tasks
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, rewardManager::checkDailyReset, 0L, 20L * 60 * 60);
 
-        getLogger().info("Plugin DailyRewards version " + getDescription().getVersion() + " activé");
+        getLogger().info("DailyRewards plugin version " + getDescription().getVersion() + " enabled");
     }
 
     @Override
@@ -65,15 +65,15 @@ public class Rewards extends JavaPlugin {
         if (papiExpansion != null) {
             papiExpansion.unregister();
         }
-        getLogger().info("DailyRewards désactivé");
+        getLogger().info("DailyRewards disabled");
     }
 
-    // Getter pour PlayerDataManager si nécessaire ailleurs
+    // Getter for PlayerDataManager if needed elsewhere (not use)
     public PlayerDataManager getPlayerDataManager() {
         return playerDataManager;
     }
     
-    // Getter pour DayGUICommand
+    // Getter for DayGUICommand
     public DayGUICommand getDayGUICommand() {
         return dayGUICommand;
     }

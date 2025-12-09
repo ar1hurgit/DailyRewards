@@ -76,7 +76,6 @@ public class PlayerDataManager {
         saveData();
     }
 
-    // --- Méthodes existantes ---
     public boolean hasPlayerData(String uuid) {
         return playerData.contains(uuid + ".day");
     }
@@ -157,7 +156,7 @@ public class PlayerDataManager {
         return topPlayers.subList(0, Math.min(limit, topPlayers.size()));
     }
 
-    // --- Classe interne simplifiée ---
+    // Simplified internal class
     public static class PlayerData {
         private final UUID uuid;
         private final int totalClaims;

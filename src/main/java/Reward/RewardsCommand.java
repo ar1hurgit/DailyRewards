@@ -1,19 +1,14 @@
 package Reward;
 
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import Reward.Baltop.BaltopCommand;
-import Reward.Get.GetCommand;
-import Reward.Day.DayCommand;
+import Reward.baltop.BaltopCommand;
+import Reward.get.GetCommand;
+import Reward.day.DayCommand;
 import Reward.Set.SetCommand;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -32,11 +27,11 @@ public class RewardsCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
-        // ==== DEBUG: Afficher les paramètres de reset ====
+        // DEBUG: show paramètres
         plugin.getLogger().info("[DailyRewards] Reset Config - Enabled: " + plugin.getConfig().getBoolean("reset.enabled", true));
         plugin.getLogger().info("[DailyRewards] Reset Config - Delay (days): " + plugin.getConfig().getInt("reset.delay", 1));
 
-        // ==== GESTION DES COMMANDES ADMIN ====
+        // admin commands management
         if (args.length > 0 && args[0].equalsIgnoreCase("admin")) {
             if (args.length == 1) {
                 if (!checkAdminPermissions(sender)) {
@@ -62,13 +57,9 @@ public class RewardsCommand implements CommandExecutor {
             }
         }
 
-        // ==== VÉRIFICATION QUE L'EXPÉDITEUR EST UN JOUEUR POUR LES COMMANDES NON-ADMIN ====
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(Utils.color("&cOnly players can use this command!"));
-            return true;
-        }
+        if (!(sender instanceof Player)) {return true;}
 
-        // ==== GESTION DES COMMANDES JOUEUR ====
+        //command player
         if (args.length > 0) {
             switch (args[0].toLowerCase()) {
                 case "get":
@@ -79,17 +70,16 @@ public class RewardsCommand implements CommandExecutor {
             }
         }
 
-        // ==== CODE ORIGINAL POUR LES JOUEURS ====
         Player player = (Player) sender;
         String uuid = player.getUniqueId().toString();
         plugin.getLogger().info("[DailyRewards] Player UUID: " + uuid);
 
-        // ==== GESTION DES JOURS DE RÉCOMPENSE ====
+        // dailyrewards management
         int currentDay = playerData.getDay(uuid);
         int rewardsPerPage = 45;
         int page = (currentDay - 1) / rewardsPerPage;
 
-        // ==== GESTION DE LA RÉINITIALISATION ====
+        // reset management
         String lastClaimStr = playerData.getLastClaim(uuid);
         LocalDateTime now = LocalDateTime.now();
         int delayDays = plugin.getConfig().getInt("reset.delay", 1);
@@ -100,7 +90,7 @@ public class RewardsCommand implements CommandExecutor {
             return true;
         }
 
-        // ==== PARSING DE LA DERNIÈRE RÉCLAMATION ====
+        //analysis of the last claim date
         LocalDateTime lastClaim;
         try {
             lastClaim = LocalDateTime.parse(lastClaimStr);
@@ -110,18 +100,18 @@ public class RewardsCommand implements CommandExecutor {
             return true;
         }
 
-        // ==== CALCUL DE LA PROCHAINE RÉINITIALISATION ====
+        // next day
         LocalDateTime nextReset = lastClaim.plusDays(delayDays);
         boolean shouldReset = resetEnabled && now.isAfter(nextReset);
 
         if (shouldReset) {
             playerData.setDay(uuid, 0);
             playerData.setLastClaim(uuid, now.minusDays(1).toString());
-            player.sendMessage(Utils.color("&4Your progress has been reset to Day 1!"));
+            player.sendMessage(Utils.color("&4Your progress has been reset to day 1!"));
             page = 0;
         }
 
-        // ==== OUVERTURE DE L'INTERFACE ====
+        // gui opening
         guiManager.openRewardsGUI(player, page);
         return true;
     }

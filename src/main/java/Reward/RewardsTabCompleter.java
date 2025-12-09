@@ -36,7 +36,7 @@ public class RewardsTabCompleter implements TabCompleter {
                 try {
                     UUID uuid = UUID.fromString(key);
                     String name = Utils.getPlayerName(uuid, plugin);
-                    if (name != null && !name.isBlank()) out.add(name); // pas d’UUID si nom inconnu
+                    if (name != null && !name.isBlank()) out.add(name); // no UUID if player not found
                 } catch (IllegalArgumentException ignored) {}
             }
         }

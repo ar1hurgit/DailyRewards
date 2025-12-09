@@ -1,4 +1,4 @@
-package Reward.Listener;
+package Reward.listener;
 
 import Reward.PlayerDataManager;
 import Reward.Rewards;
@@ -39,7 +39,6 @@ public class PlayerJoinListener implements Listener {
                 plugin.getLogger().info("Successfully initialized data for new player: " + playerName);
             } else {
                 plugin.getLogger().info(" Returning player detected: " + playerName + " (" + uuid + ")");
-                // Optional: You could add checks for daily reward availability here
             }
         } catch (Exception e) {
             plugin.getLogger().severe("Error processing join event for player " + playerName + ": " + e.getMessage());

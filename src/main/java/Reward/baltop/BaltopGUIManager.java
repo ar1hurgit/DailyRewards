@@ -1,4 +1,4 @@
-package Reward.Baltop;
+package Reward.baltop;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -33,19 +33,19 @@ public class BaltopGUIManager implements Listener {
         int totalPages = (int) Math.ceil((double) sorted.size() / PLAYER_SLOTS);
         page = Math.max(0, Math.min(page, totalPages - 1));
 
-        // Créer l'inventaire avec le holder
+        // Gui
         BaltopHolder holder = new BaltopHolder(page);
         Inventory gui = Bukkit.createInventory(holder, 54,
-                Utils.color("&4&lTop Joueurs - Page " + (page + 1) + "/" + totalPages));
+                Utils.color("&4&lTop player - Page " + (page + 1) + "/" + totalPages));
 
-        // Fond gris
+        // background
         ItemStack bg = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta bgMeta = bg.getItemMeta();
         bgMeta.setDisplayName(" ");
         bg.setItemMeta(bgMeta);
         for (int slot : DECORATION_SLOTS) gui.setItem(slot, bg);
 
-        // Joueurs
+        // players
         int startIndex = page * PLAYER_SLOTS;
         for (int i = 0; i < PLAYER_SLOTS; i++) {
             int index = startIndex + i;
@@ -57,13 +57,13 @@ public class BaltopGUIManager implements Listener {
 
         // Navigation
         if (page > 0) {
-            gui.setItem(45, Utils.createItem(Material.ARROW, "&6← Page Précédente"));
+            gui.setItem(45, Utils.createItem(Material.ARROW, "&6 ←"));
         }
         if (page < totalPages - 1) {
-            gui.setItem(53, Utils.createItem(Material.ARROW, "&6Page Suivante →"));
+            gui.setItem(53, Utils.createItem(Material.ARROW, "&6 →"));
         }
 
-        // Propre tête
+        // User PlayerHead
         gui.setItem(49, createViewerHead(viewer));
 
         viewer.openInventory(gui);
@@ -77,12 +77,12 @@ public class BaltopGUIManager implements Listener {
         org.bukkit.inventory.meta.ItemMeta meta = head.getItemMeta();
 
         String name = Reward.Utils.getPlayerName(uuid, pluginRef);
-        String display = (name == null || name.isBlank()) ? "§cJoueur #" + rank : name;
+        String display = (name == null || name.isBlank()) ? "§cPlayer #" + rank : name;
 
         meta.setDisplayName(Reward.Utils.color("&6" + display));
         meta.setLore(java.util.Arrays.asList(
                 Reward.Utils.color("&7Rank: &4#" + rank),
-                Reward.Utils.color("&7Jour: &e" + Reward.Utils.getOrdinal(day))
+                Reward.Utils.color("&7Day: &e" + Reward.Utils.getOrdinal(day))
         ));
         head.setItemMeta(meta);
         return head;
@@ -98,8 +98,8 @@ public class BaltopGUIManager implements Listener {
         meta.setOwningPlayer(viewer);
         meta.setDisplayName(Utils.color("&a" + viewer.getName()));
         meta.setLore(Arrays.asList(
-                Utils.color("&7Ton rank: &4#" + viewerRank),
-                Utils.color("&7Ton jour: &e" + Utils.getOrdinal(viewerDay))
+                Utils.color("&7your rank: &4#" + viewerRank),
+                Utils.color("&7your day: &e" + Utils.getOrdinal(viewerDay))
         ));
         head.setItemMeta(meta);
         return head;
@@ -124,9 +124,9 @@ public class BaltopGUIManager implements Listener {
         if (!(event.getWhoClicked() instanceof Player player)) return;
         int slot = event.getSlot();
 
-        if (slot == 45) { // Page précédente
+        if (slot == 45) { // previous page
             openBaltopGUI(player, holder.getPage() - 1);
-        } else if (slot == 53) { // Page suivante
+        } else if (slot == 53) { // next page
             openBaltopGUI(player, holder.getPage() + 1);
         }
     }

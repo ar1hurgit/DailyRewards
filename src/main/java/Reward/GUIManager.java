@@ -42,7 +42,7 @@ public class GUIManager implements Listener {
 
 
 
-        // Fond gris
+        // gray background
         ItemStack bg = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta bgMeta = bg.getItemMeta();
         bgMeta.setDisplayName(" ");
@@ -51,7 +51,7 @@ public class GUIManager implements Listener {
 
 
 
-        // Récompenses
+        // reward
         String uuid = player.getUniqueId().toString();
         int currentDay = playerData.getDay(uuid);
         String lastClaimStr = playerData.getLastClaim(uuid);
@@ -87,15 +87,15 @@ public class GUIManager implements Listener {
         int totalPages = (int) Math.ceil((double) totalDays / itemsPerPage);
         int currentPage = holder.getPage();
 
-        if (slot == 45) { // Précédent
+        if (slot == 45) { // previous
             if (currentPage > 0) {
                 openRewardsGUI(player, currentPage - 1);
             }
-        } else if (slot == 53) { // Suivant
+        } else if (slot == 53) { // next
             if (currentPage < totalPages - 1) {
                 openRewardsGUI(player, currentPage + 1);
             }
-        } else if (slot >= 0 && slot < 45) { // Clic sur une récompense
+        } else if (slot >= 0 && slot < 45) { // Clicking on a reward
             rewardManager.handleRewardClaim(player, event.getCurrentItem());
         }
     }

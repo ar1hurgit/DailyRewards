@@ -1,4 +1,4 @@
-package Reward.Get;
+package Reward.get;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -32,7 +32,7 @@ public class GetCommand {
             return false;
         }
 
-        // Affiche les informations
+        // displays information of the player
         int day = playerData.getDay(uuidStr);
         sender.sendMessage(Utils.color("&a" + target.getName() +
                 " is on " + Utils.getOrdinal(day) + " day!"));

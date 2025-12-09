@@ -44,7 +44,7 @@ public class SetCommand {
             int adjustedDay = day - 1;
             playerData.setDay(uuidStr, adjustedDay);
 
-            // Réinitialisation de lastClaim pour permettre une réclamation immédiate
+            // Reset of lastClaim to allow immediate claim
             playerData.setLastClaim(uuidStr, LocalDateTime.now().minusDays(1).toString());
 
             sender.sendMessage(Utils.color("&aSet " + target.getName() + "'s reward day to " + day));

@@ -1,11 +1,11 @@
-package Reward.Listener;
+package Reward.listener;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import Reward.Rewards;
-import Reward.Day.DayGUICommand;
+import Reward.day.DayGUICommand;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,22 +19,12 @@ public class ChatInputListener implements Listener {
         this.plugin = plugin;
     }
 
-    /**
-     * Définit si un joueur est en attente d'une saisie de montant.
-     * @param player Le joueur concerné.
-     * @param waiting `true` si en attente, `false` sinon.
-     */
     public void setWaitingForMoneyInput(Player player, boolean waiting) {
         if (player !=null) {
             waitingForMoneyInput.put(player.getUniqueId(), waiting);
         }
     }
 
-    /**
-     * Vérifie si un joueur est en attente d'une saisie de montant.
-     * @param player Le joueur à vérifier.
-     * @return `true` si en attente, `false` sinon.
-     */
     public boolean isWaitingForMoneyInput(Player player) {
         return player != null&& waitingForMoneyInput.getOrDefault(player.getUniqueId(), false);
     }
@@ -59,7 +49,7 @@ public class ChatInputListener implements Listener {
                     plugin.getLogger().severe("[DailyRewards] dayGUICommand is null while processing chat input.");
                 }
 
-                waitingForMoneyInput.remove(playerUUID); // Nettoyage
+                waitingForMoneyInput.remove(playerUUID); // cleanup
                 plugin.getLogger().info("[DailyRewards] Cleared waiting flag for " + player.getName());
             });
         }

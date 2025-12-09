@@ -30,7 +30,7 @@ public class Utils {
         return ChatColor.translateAlternateColorCodes('&', text);
     }
     public static String getPlayerName(UUID uuid, JavaPlugin plugin) {
-        // 1) plugin data (si tu l’enregistres)
+        // plugin data
         try {
             File dataFile = new File(plugin.getDataFolder(), "player_data.yml");
             if (dataFile.exists()) {
@@ -40,7 +40,7 @@ public class Utils {
             }
         } catch (Exception ignored) {}
 
-        // 2) usercache.json du serveur (pas de Bukkit.getOfflinePlayer)
+        // usercache.json of the server
         try {
             File usercache = new File(Bukkit.getWorldContainer(), "usercache.json");
             if (!usercache.exists()) usercache = new File("usercache.json");
@@ -57,7 +57,7 @@ public class Utils {
             }
         } catch (Exception ignored) {}
 
-        return null; // inconnu => pas de fallback UUID pour éviter l’auto-complétion moche
+        return null; // unknown player
     }
 
     public static ItemStack getPlayerHead(UUID uuid, JavaPlugin plugin) {
@@ -66,7 +66,7 @@ public class Utils {
 
         PlayerProfile profile = Bukkit.createProfile(uuid);
         try {
-            // Paper 1.20+ : remplit nom + textures
+            // playerhead texture and name
             profile.complete(true);
         } catch (Throwable t) {
             try { profile.complete(); } catch (Throwable ignored) {}

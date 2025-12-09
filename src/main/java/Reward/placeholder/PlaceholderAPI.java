@@ -1,4 +1,4 @@
-package Reward.Placeholder;
+package Reward.placeholder;
 
 import Reward.PlayerDataManager;
 import Reward.Rewards;
@@ -76,7 +76,7 @@ public class PlaceholderAPI extends PlaceholderExpansion {
 
     private String getTopPlayersFormatted(int limit) {
         try {
-            // Utiliser le même système que BaltopGUI
+            // Use the same system as BaltopGUI
             Map<UUID, Integer> allPlayers = playerDataManager.getAllPlayerDays();
             List<Map.Entry<UUID, Integer>> sorted = new ArrayList<>(allPlayers.entrySet());
             sorted.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
@@ -84,7 +84,7 @@ public class PlaceholderAPI extends PlaceholderExpansion {
             StringBuilder result = new StringBuilder();
 
             if (sorted.isEmpty()) {
-                return "Aucun joueur dans le classement";
+                return "No player in the baltop";
             }
 
             int displayLimit = Math.min(limit, sorted.size());
@@ -100,13 +100,13 @@ public class PlaceholderAPI extends PlaceholderExpansion {
                         .append(playerName)
                         .append(" §f- §a")
                         .append(days)
-                        .append(" récompenses\n");
+                        .append(" rewards\n");
             }
 
             return result.toString().trim();
         } catch (Exception e) {
-            plugin.getLogger().severe("Erreur dans getTopPlayersFormatted: " + e.getMessage());
-            return "Erreur de classement";
+            plugin.getLogger().severe("error in getTopPlayersFormatted: " + e.getMessage());
+            return "error from the baltop placeholder";
         }
     }
 
@@ -119,7 +119,7 @@ public class PlaceholderAPI extends PlaceholderExpansion {
             StringBuilder result = new StringBuilder();
 
             if (sorted.isEmpty()) {
-                return "§cAucun joueur dans le classement";
+                return "§cNo player in the baltop";
             }
 
             String[] colors = {"§6", "§7", "§8", "§9", "§a", "§b", "§c", "§d", "§e", "§f"};
@@ -138,13 +138,13 @@ public class PlaceholderAPI extends PlaceholderExpansion {
                         .append(playerName)
                         .append(" §7- §a")
                         .append(days)
-                        .append(" récompenses\n");
+                        .append(" rewards\n");
             }
 
             return result.toString().trim();
         } catch (Exception e) {
-            plugin.getLogger().severe("Erreur dans getTopPlayersColored: " + e.getMessage());
-            return "Erreur de classement";
+            plugin.getLogger().severe("error in getTopPlayersColored: " + e.getMessage());
+            return "error from the baltop placeholder";
         }
     }
 
@@ -186,12 +186,12 @@ public class PlaceholderAPI extends PlaceholderExpansion {
                 return offlinePlayer.getName();
             }
 
-            // Fallback: essayez de récupérer le nom depuis votre PlayerDataManager si possible
-            // (vous devrez peut-être ajouter une méthode pour stocker les noms)
-            return "Joueur #" + uuid.toString().substring(0, 8);
+            // try to get the name from your PlayerDataManager if possible
+
+            return "player #" + uuid.toString().substring(0, 8);
 
         } catch (Exception e) {
-            return "Joueur inconnu";
+            return "unknown player";
         }
     }
 }

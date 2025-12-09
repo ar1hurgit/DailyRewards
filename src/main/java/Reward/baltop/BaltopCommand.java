@@ -1,5 +1,4 @@
-// BaltopCommand.java
-package Reward.Baltop;
+package Reward.baltop;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -16,10 +15,7 @@ public class BaltopCommand {
     }
 
     public boolean execute(CommandSender sender, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(Utils.color("&cOnly players can use this command!"));
-            return true;
-        }
+        if (!(sender instanceof Player)) {return true;}
 
         if (!sender.hasPermission("dailyrewards.baltop")) {
             sender.sendMessage(Utils.color("&cYou don't have permission!"));
