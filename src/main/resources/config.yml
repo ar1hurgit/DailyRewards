@@ -18,21 +18,20 @@ messages:
 
 
 
-# Configuration de la monnaie
-# monney: "none" - Désactiver le système d'argent
-# monney: "vault" - Utiliser le système d'argent Vault (EssentialsX)
-# monney: "PlayerPoints" - Utiliser PlayerPoints
-# monney: "CoinsEngine" - Utiliser CoinsEngine
-# monney: "ultraeconomy" - Utiliser UltraEconomy
+# money: "none" - Disable the currency system
+# money: "vault" - Use the Vault currency system (EssentialsX)
+# money: "PlayerPoints" - Use PlayerPoints
+# money: "CoinsEngine" - Use CoinsEngine
+# money: "ultraeconomy" - Use UltraEconomy
 # ultraeconomy:
-#   currency: "default" # Nom de la monnaie (par défaut: default)
-# monney: "VotingPlugin" - Utiliser VotingPlugin
+#   currency: "default" # Name of the currency (default: default)
+# money: "VotingPlugin" - Use VotingPlugin
 
-monney: "vault"  # Par défaut, Vault (EssentialsX)
+money: "vault"  # Default: Vault (EssentialsX)
 
 
 
-# Récompenses
+# reward
 rewards:
   day-1:
     - "give {player} diamond 1"
