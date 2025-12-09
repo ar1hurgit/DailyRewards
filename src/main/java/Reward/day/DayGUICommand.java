@@ -252,11 +252,6 @@ public class DayGUICommand implements CommandExecutor, Listener {
         }, 1L);
     }
 
-    @EventHandler
-    public void onMoneyInputClick(InventoryClickEvent event) {
-        //todo delete
-        return;
-    }
 
     public void processMoneyInput(String input) {
         plugin.getLogger().info("[DailyRewards] processMoneyInput input='" + input + "' day=" + currentDay + ", player=" + (currentPlayer != null ? currentPlayer.getName() : "null"));
@@ -270,8 +265,8 @@ public class DayGUICommand implements CommandExecutor, Listener {
             int money = Integer.parseInt(input);
             plugin.getLogger().info("[DailyRewards] Parsed money=" + money);
             
-            if (money <= 0) {
-                currentPlayer.sendMessage(Utils.color("&cMoney value must be positive!"));
+            if (money < 0) {
+                currentPlayer.sendMessage(Utils.color("&cMoney value can't be negative!"));
                 reopenMainGUI();
                 return;
             }
