@@ -1,4 +1,4 @@
-package Reward.Set;
+package Reward.set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;

@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import Reward.baltop.BaltopCommand;
 import Reward.get.GetCommand;
 import Reward.day.DayCommand;
-import Reward.Set.SetCommand;
+import Reward.set.SetCommand;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
@@ -124,7 +124,7 @@ public class RewardsCommand implements CommandExecutor {
 
     private void sendAdminHelp(CommandSender sender) {
         sender.sendMessage(Utils.color("&6Admin Commands:"));
-        sender.sendMessage(Utils.color("&e/rewards admin set <player> <day> &7- Set player day"));
+        sender.sendMessage(Utils.color("&e/rewards admin set <player> <day> &7- set player day"));
         sender.sendMessage(Utils.color("&e/rewards admin day <day> &7- Configure rewards for a specific day"));
     }
 }
