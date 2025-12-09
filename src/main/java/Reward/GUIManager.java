@@ -10,7 +10,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
 
 
 public class GUIManager implements Listener {
@@ -30,17 +29,13 @@ public class GUIManager implements Listener {
     public void openRewardsGUI(Player player, int page) {
 
         int totalDays = plugin.getConfig().getInt("total-days");
-
         int itemsPerPage = rewardSlots.length;
-
         int totalPages = (int) Math.ceil((double) totalDays / itemsPerPage);
 
         Inventory gui = Bukkit.createInventory(new RewardsHolder(page), 54,
                 Utils.color(plugin.getConfig().getString("gui.title"))
                         .replace("{page}", String.valueOf(page + 1))
                         .replace("{max}", String.valueOf(totalPages)));
-
-
 
         // gray background
         ItemStack bg = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
@@ -49,9 +44,7 @@ public class GUIManager implements Listener {
         bg.setItemMeta(bgMeta);
         for (int i = 45; i < 54; i++) gui.setItem(i, bg);
 
-
-
-        // reward
+        // rewards
         String uuid = player.getUniqueId().toString();
         int currentDay = playerData.getDay(uuid);
         String lastClaimStr = playerData.getLastClaim(uuid);
@@ -61,6 +54,7 @@ public class GUIManager implements Listener {
             if (day > totalDays) break;
             gui.setItem(rewardSlots[i], rewardManager.createRewardItem(day, currentDay, lastClaimStr));
         }
+
         // Navigation
         if (page < 0) page = 0;
         if (page >= totalPages) page = totalPages - 1;
@@ -80,6 +74,7 @@ public class GUIManager implements Listener {
         if (!(event.getInventory().getHolder() instanceof RewardsHolder holder)) return;
         event.setCancelled(true);
         if (!(event.getWhoClicked() instanceof Player player)) return;
+
         int slot = event.getSlot();
 
         int totalDays = plugin.getConfig().getInt("total-days");
@@ -88,15 +83,28 @@ public class GUIManager implements Listener {
         int currentPage = holder.getPage();
 
         if (slot == 45) { // previous
-            if (currentPage > 0) {
-                openRewardsGUI(player, currentPage - 1);
-            }
+            if (currentPage > 0) openRewardsGUI(player, currentPage - 1);
+
         } else if (slot == 53) { // next
-            if (currentPage < totalPages - 1) {
-                openRewardsGUI(player, currentPage + 1);
+            if (currentPage < totalPages - 1) openRewardsGUI(player, currentPage + 1);
+
+        } else if (slot >= 0 && slot < 45) { // reward clicked
+            ItemStack rewardItem = event.getCurrentItem();
+            if (rewardItem == null || rewardItem.getType() == Material.AIR) return;
+
+            int itemsNeeded = rewardItem.getAmount();
+
+            int freeSlots = 0;
+            for (ItemStack content : player.getInventory().getStorageContents()) {
+                if (content == null || content.getType() == Material.AIR) freeSlots++;
             }
-        } else if (slot >= 0 && slot < 45) { // Clicking on a reward
-            rewardManager.handleRewardClaim(player, event.getCurrentItem());
+
+            if (freeSlots < itemsNeeded) {
+                player.sendMessage("§cYou don't have enough space in your inventory!");
+                return;
+            }
+
+            rewardManager.handleRewardClaim(player, rewardItem);
         }
     }
 
@@ -104,6 +112,6 @@ public class GUIManager implements Listener {
         private final int page;
         public RewardsHolder(int page) { this.page = page; }
         public int getPage() { return page; }
-        public  Inventory getInventory() { return null; }
+        public Inventory getInventory() { return null; }
     }
 }

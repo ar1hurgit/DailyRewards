@@ -1,18 +1,18 @@
-# Paramètres
+# Parameters
 total-days: 100
 
 # Interface
 gui:
-  title: "&6DailyRewardss &7(Page {page}/{max})"
+  title: "&6DailyRewards &7(Page {page}/{max})"
   navigation:
-    previous: "&aPage précédente"
-    next: "&aPage suivante"
+    previous: "&aPrevious Page"
+    next: "&aNext Page"
 
 # Messages
 messages:
-  claim-success: "&aVous avez réclamé la récompense du jour {day} !"
-  invalid-order: "&cVous devez réclamer les jours dans l'ordre !"
-  wait-message: "&eRevenez dans {time} heures !"
+  claim-success: "&aYou have claimed the reward for day {day}!"
+  invalid-order: "&cYou must claim the days in order!"
+  wait-message: "&eCome back in {time} hours!"
 
 
 

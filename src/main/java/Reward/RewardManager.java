@@ -119,49 +119,67 @@ public class RewardManager {
             int currentDay = playerData.getDay(uuid);
             String lastClaimStr = playerData.getLastClaim(uuid);
 
+            // Check if the clicked day is the next claimable day
             if (day != currentDay + 1) {
                 player.sendMessage(Utils.color(plugin.getConfig().getString("messages.invalid-order")));
                 return;
             }
+
+            // Check cooldown
             if (lastClaimStr != null && !isReadyToClaim(lastClaimStr)) {
                 player.sendMessage(Utils.color(plugin.getConfig().getString("messages.wait-message")
                         .replace("{time}", String.valueOf(getRemainingHours(lastClaimStr)))));
                 return;
             }
 
-            // Exécuter les récompenses d'objets
+            // Collect all item rewards for this day
+            List<ItemStack> itemsToGive = new ArrayList<>();
             for (String command : plugin.getConfig().getStringList("rewards.day-" + day)) {
                 if (command.startsWith("item:")) {
                     ItemStack rewardItem = Utils.deserializeItemStack(command.substring(5));
-                    if (rewardItem != null) player.getInventory().addItem(rewardItem);
-                } else {
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
+                    if (rewardItem != null) itemsToGive.add(rewardItem);
                 }
             }
-            
-            // Exécuter les commandes personnalisées (y compris l'argent)
-            for (String command : plugin.getConfig().getStringList("rewards.day-" + day + "-commands")) {
-                if (command != null && !command.trim().isEmpty()) {
+
+            // Count free inventory slots
+            long freeSlots = player.getInventory().getStorageContents().length
+                    - java.util.Arrays.stream(player.getInventory().getStorageContents())
+                    .filter(i -> i != null && i.getType() != Material.AIR)
+                    .count();
+
+            // If there are not enough free slots, cancel the claim
+            if (freeSlots < itemsToGive.size()) {
+                player.sendMessage(Utils.color("&cYou do not have enough inventory space!"));
+                return;
+            }
+
+            // Give the item rewards
+            for (ItemStack it : itemsToGive) {
+                player.getInventory().addItem(it);
+            }
+
+            // Execute other normal commands (money, etc.)
+            for (String command : plugin.getConfig().getStringList("rewards.day-" + day)) {
+                if (!command.startsWith("item:")) {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
                 }
             }
 
-            // Exécuter les commandes d'argent depuis money.yml
+            // Execute money.yml commands
             List<String> moneyCmds = getMoneyCommandsForDay(day);
             if (!moneyCmds.isEmpty()) {
-                plugin.getLogger().info("[DailyRewards] Executing " + moneyCmds.size() + " money command(s) from money.yml for day=" + day);
                 for (String command : moneyCmds) {
                     if (command != null && !command.trim().isEmpty()) {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
                     }
                 }
-            } else {
-                plugin.getLogger().info("[DailyRewards] No money commands found in money.yml for day=" + day);
             }
 
+            // Update player data
             playerData.setDay(uuid, day);
             playerData.setLastClaim(uuid, LocalDateTime.now().toString());
             player.closeInventory();
+
             player.sendMessage(Utils.color(plugin.getConfig().getString("messages.claim-success")
                     .replace("{day}", String.valueOf(day))));
 
@@ -170,6 +188,7 @@ public class RewardManager {
             plugin.getLogger().warning("Error handling reward claim: " + e.getMessage());
         }
     }
+
 
     private boolean isReadyToClaim(String lastClaimStr) {
         try {
