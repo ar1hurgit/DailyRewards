@@ -64,9 +64,4 @@
 <p><strong>Using <a href="https://gradle.org/">gradle</a>:</strong></p>
 <pre><code class="language-sh">❯ gradle build
 </code></pre>
-<h3>Usage</h3>
-<p>Run the project with:</p>
-<p><strong>Using <a href="https://gradle.org/">gradle</a>:</strong></p>
-<pre><code class="language-sh">gradle run
-</code></pre>
 <hr></div></div>
